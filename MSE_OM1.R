@@ -21,10 +21,11 @@ setwd(paste("/home/miethet/MSE_whiting/whiting_new", sep=""))
 source("a4a_mse_WKNSMSE_funs.R")
 
 om_opt<-"OM1"
+n<-1000 
 
 ### save workspace to start from here
 # save.image(file = "input/whg4/image_10.RData")
-load(file = paste0("input/whg4/image_",om_opt,"_1000.RData"))
+load(file = paste0("input/whg4/base_image/image_",om_opt,"_",n,".RData"))
 
 
 

@@ -4,15 +4,12 @@
 ### load files from package mse for easier debugging
 
 #devtools::install_github("fishfollower/SAM/stockassessment")
-#
-#devtools::install_github(repo = "flr/mse")
-#devtools::install_github("shfischer/FLfse/FLfse")
-#install.packages(pkgs = c("FLCore"), repos = "http://flr-project.org/R")
+#install.packages('devtools', 'http://cran.ma.imperial.ac.uk') # use mirror according with
 #install.packages(pkgs = c("FLAssess"), repos = "http://flr-project.org/R")
 #install.packages(pkgs = c("FLash"), repos = "http://flr-project.org/R")
-#install.packages(pkgs = c("FLCore"), repos = "http://flr-project.org/R")
 #install.packages(pkgs = c("ggplotFL"), repos = "http://flr-project.org/R")
-#devtools::install("D:\\Tanja\\WKNSMSE\\mse-master\\mse-master")
+#devtools::install(“…”) # give path to unzipped master use this to install
+
 
 ### base on SAM assessment
 
@@ -200,17 +197,17 @@ suppressWarnings(. <- capture.output(sr1 <- fmle(sr1)))
 # sr <- fmle_parallel(sr, cl)
 
 
-tiff("output/sr1983.tiff", bg="white",  res=200, width = 1200, height = 1100)
+tiff(paste0("output/",n,"sr1983.tiff"), bg="white",  res=200, width = 1200, height = 1100)
 par(mar=c(4,4,4,1))
 plot(sr[,,,,,1], cex=0.5)
 dev.off()
 
-tiff("output/sr1983_alliters.tiff", bg="white",  res=200, width = 1200, height = 1100)
+tiff(paste0("output/",n,"sr1983_alliters.tiff"), bg="white",  res=200, width = 1200, height = 1100)
 par(mar=c(4,4,4,1))
 plot(sr, cex=0.5)
 dev.off()
 
-tiff("output/sr2002.tiff", bg="white",  res=200, width = 1200, height = 1100)
+tiff(paste0("output/",n,"sr2002.tiff"), bg="white",  res=200, width = 1200, height = 1100)
 par(mar=c(4,4,4,1))
 plot(sr1[,,,,,1], cex=0.5)
 dev.off()
@@ -243,12 +240,12 @@ acfRecLag12<- round(ACFrec1$acf[,,][2],2)
 
 
 # autocorrelation plots
-tiff("output/acf1983.tiff", bg="white",  res=200, width = 900, height = 900)
+tiff(paste0("output/",n,"acf1983.tiff"), bg="white",  res=200, width = 900, height = 900)
 par(mar=c(4,4,4,1))
 acf(window(stock.n(stk_orig)[1], start = 1983),lag.max=7, plot=T, main=paste("Autocor. in Rec, Lag1 =",acfRecLag11,sep=" "), cex=0.5)
 dev.off()
 
-tiff("output/acf2002.tiff", bg="white",  res=200, width = 900, height = 900)
+tiff(paste0("output/",n,"acf2002.tiff"), bg="white",  res=200, width = 900, height = 900)
 par(mar=c(4,4,4,1))
 acf(window(stock.n(stk_orig)[1], start = 2002),lag.max=7, plot=T, main=paste("Autocor. in Rec, Lag1 =",acfRecLag12,sep=" "), cex=0.5)
 dev.off()
@@ -468,7 +465,7 @@ model[i]<-ind
 for(i in 1:RS){
          for (ii in 1:x[i]){
          
-if(as.character(yrx[i]+ii)<=2039) res2[,as.character(yrx[i]+ii),,,,its]<-res2[,as.character(yrx[i]+ii),,,,its]*rule[model[i]]
+if(as.character(yrx[i]+ii)<=2038) res2[,as.character(yrx[i]+ii),,,,its]<-res2[,as.character(yrx[i]+ii),,,,its]*rule[model[i]]
 
 }}}
 
@@ -516,7 +513,7 @@ model[i]<-ind
 for(i in 1:RS){
          for (ii in 1:x[i]){
          
-if(as.character(yrx[i]+ii)<=2039) res3[,as.character(yrx[i]+ii),,,,its]<-res3[,as.character(yrx[i]+ii),,,,its]*rule[model[i]]
+if(as.character(yrx[i]+ii)<=2038) res3[,as.character(yrx[i]+ii),,,,its]<-res3[,as.character(yrx[i]+ii),,,,its]*rule[model[i]]
 
 }}}
 
@@ -549,12 +546,12 @@ dev.off()
 rec1 <- as.data.frame( residuals(sr_))
 rec2 <- as.data.frame( residuals(sr_dip))
 
-test$future1<-test$fitted*rec1[rec1$year%in%c(2005:2039),"data"]
-test$future2<-test$fitted*rec2[rec2$year%in%c(2005:2039),"data"]
+test$future1<-test$fitted*rec1[rec1$year%in%c(2005:2038),"data"]
+test$future2<-test$fitted*rec2[rec2$year%in%c(2005:2038),"data"]
 
 
 # Plot past and future stock recruit pairs for selected iters
-tiff("output/sr1983_srpairs_iters.tiff", bg="white",  res=200, width = 1200, height = 1100)
+tiff(paste0("output/",n,"sr1983_srpairs_iters.tiff"), bg="white",  res=200, width = 1200, height = 1100)
 par(mar=c(4,4,4,1))
 ggplot(test[is.element(test$iter, i_samp),]) +
   geom_point(aes(x = SSB, y = rec), 
@@ -567,7 +564,7 @@ ggplot(test[is.element(test$iter, i_samp),]) +
 dev.off()
 
 # Empirical cumulative distributions for the same iters
-tiff("output/sr1983_cumulative_iters.tiff", bg="white",  res=200, width = 1200, height = 1100)
+tiff(paste0("output/",n,"sr1983_cumulative_iters.tiff"), bg="white",  res=200, width = 1200, height = 1100)
 par(mar=c(4,4,4,1))
 ggplot(test[is.element(test$iter, i_samp),]) +
   stat_ecdf(aes(rec), geom = "step", colour = "red") +
@@ -578,7 +575,7 @@ dev.off()
 
 # Combine previous two plots over iters
 # Stock recruit pairs
-tiff("output/sr1983_srpairs.tiff", bg="white",  res=200, width = 1200, height = 1100)
+tiff(paste0("output/",n,"sr1983_srpairs.tiff"), bg="white",  res=200, width = 1200, height = 1100)
 par(mar=c(4,4,4,1))
 
 ggplot(test) +
@@ -592,7 +589,7 @@ dev.off()
 
 # Empirical cumulative distribution
 
-tiff("output/sr1983_cumulative.tiff", bg="white",  res=200, width = 1200, height = 1100)
+tiff(paste0("output/",n,"sr1983_cumulative.tiff"), bg="white",  res=200, width = 1200, height = 1100)
 par(mar=c(4,4,4,1))
 ggplot(test) +
   stat_ecdf(aes(rec), geom = "step", colour = "red") +
@@ -603,7 +600,7 @@ dev.off()
 
 # Combine previous two plots over iters
 # Stock recruit pairs
-tiff("output/sr1983_compare_srpairs.tiff", bg="white",  res=200, width = 1200, height = 1100)
+tiff(paste0("output/",n,"sr1983_compare_srpairs.tiff"), bg="white",  res=200, width = 1200, height = 1100)
 par(mar=c(4,4,4,1))
 
 ggplot(test) +

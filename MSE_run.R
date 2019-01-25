@@ -105,7 +105,7 @@ OM_opt<-"OM1"
 
 
 ### load input objects
-input <- readRDS(paste0(path_data,"base_run/",OM_opt,"_base_run1000.rds"))
+input <- readRDS(paste0(path_data,"base_run/",OM_opt,"_base_run",iters,".rds"))
 
 ### modify input for running in parallel
 input$genArgs$nblocks <- nblocks
@@ -229,7 +229,7 @@ if (exists("BB")) {
 ### run MSE ####
 ### ------------------------------------------------------------------------ ###
 
-debugonce(mse:::goFish)
+#debugonce(mse:::goFish)
 
 print(Sys.time())
 
@@ -247,7 +247,8 @@ print(Sys.time())
 
 path_out <- paste0("output/runs/whg4/", iters, "_", years)
 dir.create(path = path_out, recursive = TRUE)
-file_out <- paste0("HCR-", input$ctrl.mp$ctrl.hcr@args$option,
+file_out <- paste0(OM_opt,
+                "_HCR-", input$ctrl.mp$ctrl.hcr@args$option,
                    "_Ftrgt-", input$ctrl.mp$ctrl.phcr@args$Ftrgt,
                    "_Btrigger-", input$ctrl.mp$ctrl.phcr@args$Btrigger,
                    "_TACconstr-", input$ctrl.mp$ctrl.is@args$TAC_constraint,
