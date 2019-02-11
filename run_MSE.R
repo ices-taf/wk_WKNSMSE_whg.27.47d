@@ -57,6 +57,18 @@ source("a4a_mse_WKNSMSE_funs.R")
 ### par_env=1 -> MPI (Rmpi, DoMPI)
 ### par_env=2 -> DoParallel
 
+### ------------------------------------------------------------------------ ###
+### set HCR parameters 
+
+if (HCRoption %in% 1:6) {
+  hcr_vals <- expand.grid(
+    #Ftrgt = seq(from = 0.05, to = 0.2, by = 0.05),
+    Ftrgt = seq(from = 0.08, to = 0.18, by = 0.02),
+    Btrigger = seq(from = 150000, to = 180000, by = 10000))
+
+}
+
+for (HCR_comb in 1:24){
 if (par_env == 1) {
   
   library(doMPI)
@@ -134,69 +146,6 @@ if (exists("HCRoption")) {
  HCRoption <- 0
   
 }
-
-### ------------------------------------------------------------------------ ###
-### set HCR parameters 
-
-### create Btrigger & Ftrgt combinations
-#hcr_vals <- expand.grid(
-#  Btrigger =  166708 ,    #seq(from = 110000, to = 190000, length.out = 5),
-#  Ftrgt = 0.1  )    #c(0.1, 0.2, 0.3, 0.4, 0.5))
-
-#if (HCRoption == 1) {
-  ### create Btrigger & Ftrgt combinations
-    Btrigger<-166708
-    Ftrgt<- 0
-    #}
- 
- ### 1-25
-#  hcr_vals <- rbind(hcr_vals,
-#    expand.grid(
-#      Btrigger = seq(from = 110000, to = 190000, length.out = 5),
-#      Ftrgt = c(0.32, 0.34, 0.36, 0.38)))
-#  ### 26-45
-#  hcr_vals <- rbind(hcr_vals,
-#    expand.grid(
-#      Btrigger = c(130000, 150000, 170000),
-#      Ftrgt = c(0.39, 0.37)))
-  ### 46-51
-#  hcr_vals <- rbind(hcr_vals,
-#    data.frame(Btrigger = c(110000), Ftrgt = c(0.35)))
-  ### 52
-#  hcr_vals <- rbind(hcr_vals,
-#    expand.grid(Btrigger = 120000, Ftrgt = c(0.35, 0.36, 0.37)),
-#    expand.grid(Btrigger = 140000, Ftrgt = c(0.36, 0.37, 0.38)),
-#    expand.grid(Btrigger = 160000, Ftrgt = c(0.37, 0.38, 0.39, 0.4))
-#  )
-  ### 53-62
-  ### assume best option is Btrigger=originial Btrigger = 150,000
-  ### additional runs for Ftrgt=0.37: 0.9*Ftrgt & 1.1*Ftrgt
-  ### FMSYlower/upper
-  ### and original Ftrgt=0.31
-#  hcr_vals <- rbind(hcr_vals,
-#    expand.grid(Btrigger = 150000, 
-#                Ftrgt = c(0.37*0.9, 0.37*1.1, 0.198, 0.46, 0.31))
-#  )
-  ### 63-67
-  ### find where risk surpasses 5% at high Btrigger values
-#  hcr_vals <- rbind(hcr_vals,
-#     expand.grid(Btrigger = 180000, Ftrgt = c(0.39, 0.4, 0.41, 0.42)),
-#    expand.grid(Btrigger = 190000, Ftrgt = c(0.41, 0.42, 0.43, 0.44))
-#  )
-  ### 68-75
-
-#} else if (HCRoption %in% 2:6) {
-#  hcr_vals <- expand.grid(
-#    Btrigger = seq(from = 110000, to = 190000, length.out = 5),
-#    Ftrgt = c(0.1, 0.2, 0.3, 0.35, 0.37, 0.4, 0.5))
-  ### 1-35
-#  hcr_vals <- rbind(hcr_vals,
-#                    data.frame(Btrigger = c(110000, 130000, 150000, 150000,
-#                                            170000, 190000, 190000, 190000),
-#                               Ftrgt = c(0.36, 0.36, 0.38, 0.39, 0.39, 0.41,
-#                                         0.42, 0.43)))
-  ### 36-43
-#}
 
 
 ### implement
@@ -352,11 +301,12 @@ file_out <- paste0("OM",om_opt,
 )
 
 saveRDS(object = res1, paste0(path_out, "/", file_out, ".rds"))
+}
 
 ### ------------------------------------------------------------------------ ###
 ### combine and plot ####
 ### ------------------------------------------------------------------------ ###
-output <- readRDS(paste0(path_out, "/", file_out, ".rds"))
+if(FALSE){output <- readRDS(paste0(path_out, "/", file_out, ".rds"))
 
 original <- readRDS(paste0("input/whg4/",iters,"_",years,"/stk.rds"))
 
@@ -388,7 +338,7 @@ ggsave(filename = paste0(path_out, "/", file_out, ".png"),
         width = 30, height = 20, units = "cm", dpi = 300, type = "cairo")
 
 
-
+}
 ### ------------------------------------------------------------------------ ###
 ### terminate ####
 ### ------------------------------------------------------------------------ ###
