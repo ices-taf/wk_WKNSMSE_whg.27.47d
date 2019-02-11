@@ -68,7 +68,7 @@ if (HCRoption %in% 1:6) {
 
 }
 
-for (HCR_comb in 1:36){
+
 if (par_env == 1) {
   
   library(doMPI)
@@ -147,6 +147,7 @@ if (exists("HCRoption")) {
   
 }
 
+for (HCR_comb in 1:length(hcr_vals$Ftrgt)){
 
 ### implement
 if (exists("HCR_comb")) {
