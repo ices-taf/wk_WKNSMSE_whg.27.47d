@@ -147,7 +147,10 @@ if (exists("HCRoption")) {
   
 }
 
-for (HCR_comb in 1:length(hcr_vals$Ftrgt)){
+input_bckp <- input
+for (HCR_comb in 1:length(hcr_vals$Ftrgt)) {
+  input <- input_bckp
+
 
 ### implement
 if (exists("HCR_comb")) {
