@@ -8,16 +8,3 @@ R CMD BATCH --vanilla --quiet "--args om_opt=1 iters=1000 years=20 nblocks=200 p
 R CMD BATCH --vanilla --quiet "--args om_opt=1 iters=1000 years=20 nblocks=200 par_env=2 n_workers=30 HCRoption=5 TAC_constraint=1 BB=1" $home/wk_WKNSMSE_whg.27.47d/run_MSE_whg_JRC.R $home/wk_WKNSMSE_whg.27.47d/output/reports/jobs_array1BE.Rout
 R CMD BATCH --vanilla --quiet "--args om_opt=1 iters=1000 years=20 nblocks=200 par_env=2 n_workers=30 HCRoption=6 TAC_constraint=1 BB=1" $home/wk_WKNSMSE_whg.27.47d/run_MSE_whg_JRC.R $home/wk_WKNSMSE_whg.27.47d/output/reports/jobs_array1CE.Rout
 
-R CMD BATCH --vanilla --quiet "--args om_opt=2 iters=1000 years=20 nblocks=200 par_env=2 n_workers=30 HCRoption=1 TAC_constraint=0 BB=0" $home/wk_WKNSMSE_whg.27.47d/run_MSE_whg_JRC.R $home/wk_WKNSMSE_whg.27.47d/output/reports/jobs_array2A.Rout
-R CMD BATCH --vanilla --quiet "--args om_opt=2 iters=1000 years=20 nblocks=200 par_env=2 n_workers=30 HCRoption=2 TAC_constraint=0 BB=0" $home/wk_WKNSMSE_whg.27.47d/run_MSE_whg_JRC.R $home/wk_WKNSMSE_whg.27.47d/output/reports/jobs_array2B.Rout
-R CMD BATCH --vanilla --quiet "--args om_opt=2 iters=1000 years=20 nblocks=200 par_env=2 n_workers=30 HCRoption=3 TAC_constraint=0 BB=0" $home/wk_WKNSMSE_whg.27.47d/run_MSE_whg_JRC.R $home/wk_WKNSMSE_whg.27.47d/output/reports/jobs_array2C.Rout
-R CMD BATCH --vanilla --quiet "--args om_opt=2 iters=1000 years=20 nblocks=200 par_env=2 n_workers=30 HCRoption=4 TAC_constraint=1 BB=1" $home/wk_WKNSMSE_whg.27.47d/run_MSE_whg_JRC.R $home/wk_WKNSMSE_whg.27.47d/output/reports/jobs_array2AD.Rout
-R CMD BATCH --vanilla --quiet "--args om_opt=2 iters=1000 years=20 nblocks=200 par_env=2 n_workers=30 HCRoption=5 TAC_constraint=1 BB=1" $home/wk_WKNSMSE_whg.27.47d/run_MSE_whg_JRC.R $home/wk_WKNSMSE_whg.27.47d/output/reports/jobs_array2BE.Rout
-R CMD BATCH --vanilla --quiet "--args om_opt=2 iters=1000 years=20 nblocks=200 par_env=2 n_workers=30 HCRoption=6 TAC_constraint=1 BB=1" $home/wk_WKNSMSE_whg.27.47d/run_MSE_whg_JRC.R $home/wk_WKNSMSE_whg.27.47d/output/reports/jobs_array2CE.Rout
-
-
-R CMD BATCH --vanilla --quiet "--args om_opt=3 iters=1000 years=20 nblocks=200 par_env=2 n_workers=30 HCRoption=2 TAC_constraint=0 BB=0" $home/wk_WKNSMSE_whg.27.47d/run_MSE_whg_JRC.R $home/wk_WKNSMSE_whg.27.47d/output/reports/jobs_array3B.Rout
-R CMD BATCH --vanilla --quiet "--args om_opt=3 iters=1000 years=20 nblocks=200 par_env=2 n_workers=30 HCRoption=3 TAC_constraint=0 BB=0" $home/wk_WKNSMSE_whg.27.47d/run_MSE_whg_JRC.R $home/wk_WKNSMSE_whg.27.47d/output/reports/jobs_array3C.Rout
-R CMD BATCH --vanilla --quiet "--args om_opt=3 iters=1000 years=20 nblocks=200 par_env=2 n_workers=30 HCRoption=4 TAC_constraint=1 BB=1" $home/wk_WKNSMSE_whg.27.47d/run_MSE_whg_JRC.R $home/wk_WKNSMSE_whg.27.47d/output/reports/jobs_array3AD.Rout
-R CMD BATCH --vanilla --quiet "--args om_opt=3 iters=1000 years=20 nblocks=200 par_env=2 n_workers=30 HCRoption=5 TAC_constraint=1 BB=1" $home/wk_WKNSMSE_whg.27.47d/run_MSE_whg_JRC.R $home/wk_WKNSMSE_whg.27.47d/output/reports/jobs_array3BE.Rout
-R CMD BATCH --vanilla --quiet "--args om_opt=3 iters=1000 years=20 nblocks=200 par_env=2 n_workers=30 HCRoption=6 TAC_constraint=1 BB=1" $home/wk_WKNSMSE_whg.27.47d/run_MSE_whg_JRC.R $home/wk_WKNSMSE_whg.27.47d/output/reports/jobs_array3CE.Rout
