@@ -63,8 +63,8 @@ source("a4a_mse_WKNSMSE_funs_whg.R")
 if (HCRoption %in% 1:6) {
   hcr_vals <- expand.grid(
     #Ftrgt = seq(from = 0.05, to = 0.2, by = 0.05),
-    Ftrgt = seq(from = 0.1, to = 0.2, by = 0.02),
-    Btrigger = seq(from = 150000, to = 200000, by = 10000))
+    Ftrgt = seq(from = 0.1, to = 0.18, by = 0.02),
+    Btrigger = seq(from = 160000, to = 200000, by = 10000))
 
 }
 
