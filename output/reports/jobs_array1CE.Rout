@@ -1,0 +1,652 @@
+> ### ------------------------------------------------------------------------ ###
+> ### R script to run WKNSMSE cod MSE on HPC ####
+> ### ------------------------------------------------------------------------ ###
+> ### This is designed to be called by a job submission script
+> ### run_mse.qsub for systems using PBS and the qsub commands
+> ### run_mse.bsub for system using LSF and the bsub commands
+> 
+> 
+> ### ------------------------------------------------------------------------ ###
+> ### load arguments from job script ####
+> ### ------------------------------------------------------------------------ ###
+> 
+> ### load arguments
+> args <- commandArgs(TRUE)
+> print("arguments passed on to this script:")
+[1] "arguments passed on to this script:"
+> print(args)
+[1] "om_opt=1"         "iters=1000"       "years=20"         "nblocks=80"      
+[5] "par_env=2"        "n_workers=80"     "HCRoption=6"      "TAC_constraint=1"
+[9] "BB=1"            
+> 
+> ### evaluate arguments, if they are passed to R:
+> if (length(args) > 0) {
++   
++   ### extract arguments
++   for (i in seq_along(args)) eval(parse(text = args[[i]]))
++   
++   ### parallelisation environment
++   if (!exists("par_env")) par_env <- 1
++   if (!exists("n_workers")) n_workers <- 1
++   
++ } else {
++   
++   stop("no argument passed to R")
++   
++ }
+> 
+> ### ------------------------------------------------------------------------ ###
+> ### set up environment ####
+> ### ------------------------------------------------------------------------ ###
+> 
+> ### load packages
+> library(FLfse)
+Loading required package: FLCore
+Loading required package: lattice
+Loading required package: iterators
+FLCore (Version 2.6.12, packaged: 2019-02-18 08:43:21 UTC)
+Loading required package: foreach
+> library(stockassessment)
+> library(ggplotFL)
+Loading required package: ggplot2
+
+Attaching package: ‘ggplot2’
+
+The following object is masked from ‘package:FLCore’:
+
+    %+%
+
+Warning message:
+replacing previous import ‘ggplot2::%+%’ by ‘FLCore::%+%’ when loading ‘ggplotFL’ 
+> library(FLAssess)
+> library(mse)
+Loading required package: data.table
+Loading required package: FLash
+Loading required package: FLBRP
+
+Attaching package: ‘FLBRP’
+
+The following object is masked from ‘package:stockassessment’:
+
+    ypr
+
+> ### load files from package mse for easier debugging
+> #devtools::load_all("../mse/")
+> library(FLash)
+> library(tidyr)
+
+Attaching package: ‘tidyr’
+
+The following objects are masked from ‘package:FLCore’:
+
+    expand, spread
+
+> library(dplyr)
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:data.table’:
+
+    between, first, last
+
+The following objects are masked from ‘package:FLCore’:
+
+    combine, desc, n
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+> 
+> ### load additional functions
+> #setwd(paste("/home/miethet/MSE_whiting", sep=""))
+> source("a4a_mse_WKNSMSE_funs_whg.R")
+> 
+> ### ------------------------------------------------------------------------ ###
+> ### setup parallel environment ####
+> ### ------------------------------------------------------------------------ ###
+> ### par_env=1 -> MPI (Rmpi, DoMPI)
+> ### par_env=2 -> DoParallel
+> 
+> ### ------------------------------------------------------------------------ ###
+> ### set HCR parameters 
+> 
+> if (HCRoption %in% 1:6) {
++   hcr_vals <- expand.grid(
++     #Ftrgt = seq(from = 0.05, to = 0.2, by = 0.05),
++     Ftrgt = seq(from = 0.1, to = 0.18, by = 0.02),
++     Btrigger = seq(from = 140000, to = 200000, by = 20000))
++ 
++ }
+> 
+> 
+> if (par_env == 1) {
++   
++   library(doMPI)
++   cl <- startMPIcluster()
++   registerDoMPI(cl)
++   cl_length <- cl$workerCount
++   
++ } else if (par_env == 2) {
++   
++   library(doParallel)
++   cl <- makeCluster(n_workers)
++   registerDoParallel(cl)
++   cl_length <- length(cl)
++   
++ }
+Loading required package: parallel
+> 
+> 
+> 
+> ### load packages and functions into workers
+> . <- foreach(i = seq(cl_length)) %dopar% {
++   #devtools::load_all("../mse/")
++   library(mse)
++   library(FLash)
++   library(FLfse)
++   library(stockassessment)
++   library(foreach)
++   library(doRNG)
++   #setwd(paste("/home/miethet/MSE_whiting", sep=""))
++ 
++   source("a4a_mse_WKNSMSE_funs_whg.R")
++ }
+> 
+> ### set random seed for reproducibility
+> library(doRNG)
+Loading required package: rngtools
+Loading required package: pkgmaker
+Loading required package: registry
+
+Attaching package: ‘pkgmaker’
+
+The following object is masked from ‘package:base’:
+
+    isFALSE
+
+> registerDoRNG(123)
+> 
+> ### ------------------------------------------------------------------------ ###
+> ### load data for MSE ####
+> ### ------------------------------------------------------------------------ ###
+> 
+> ### data path
+> path_data <- paste0("input/whg4/")
+> 
+> 
+> 
+> ### load input objects
+> input <- readRDS(paste0(path_data,"base_run/OM",om_opt,"_base_run",iters,".rds"))
+> 
+> ### modify input for running in parallel
+> input$genArgs$nblocks <- nblocks
+> 
+> ### ------------------------------------------------------------------------ ###
+> ### set up HCR & options ####
+> ### ------------------------------------------------------------------------ ###
+> 
+> ### ------------------------------------------------------------------------ ###
+> ### set HCR option: A, B, C
+> if (exists("HCRoption")) {
++   
++   input$ctrl.mp$ctrl.hcr@args$option <- switch(HCRoption, 
++                                                "1" = "A", 
++                                                "2" = "B", 
++                                                "3" = "C",
++                                                "4" = "A",
++                                                "5" = "B",
++                                                "6" = "C")
++   
++   cat(paste0("\nSetting custom HCR option: HCRoption = ", HCRoption, 
++              " => HCR ", input$ctrl.mp$ctrl.hcr@args$option, "\n\n"))
++   
++ } else {
++   
++   cat(paste0("\nUsing default HCR option: HCR ", 
++              input$ctrl.mp$ctrl.hcr@args$option, "\n\n"))
++  HCRoption <- 0
++   
++ }
+
+Setting custom HCR option: HCRoption = 6 => HCR C
+
+> 
+> input_bckp <- input
+> for (HCR_comb in 1:length(hcr_vals$Ftrgt)) {
++   input <- input_bckp
++ 
++ 
++ ### implement
++ if (exists("HCR_comb")) {
++   
++   ### set Btrigger
++   Btrigger <- hcr_vals[HCR_comb, "Btrigger"]
++   input$ctrl.mp$ctrl.phcr@args$Btrigger <- Btrigger
++   input$ctrl.mp$ctrl.is@args$hcrpars$Btrigger <- Btrigger
++   
++   ### set Ftrgt
++   Ftrgt <- hcr_vals[HCR_comb, "Ftrgt"]
++   input$ctrl.mp$ctrl.phcr@args$Ftrgt <- Ftrgt
++   input$ctrl.mp$ctrl.is@args$hcrpars$Ftrgt <- Ftrgt
++   
++   cat(paste0("\nSetting custom Btrigger/Ftrgt values.\n",
++              "Using HCR_comb = ", HCR_comb, "\n",
++              "Ftrgt = ", Ftrgt, "\n",
++              "Btrigger = ", Btrigger, "\n\n"))
++   
++ } else {
++    input$ctrl.mp$ctrl.phcr@args$Ftrgt <- Ftrgt
++    input$ctrl.mp$ctrl.is@args$hcrpars$Ftrgt <- Ftrgt
++    input$ctrl.mp$ctrl.phcr@args$Btrigger <- Btrigger
++    input$ctrl.mp$ctrl.is@args$hcrpars$Btrigger <- Btrigger
++   
++   cat(paste0("\nUsing default Btrigger/Ftrgt values.\n",
++              "Ftrgt = ", input$ctrl.mp$ctrl.phcr@args$Ftrgt, "\n",
++              "Btrigger = ", input$ctrl.mp$ctrl.phcr@args$Btrigger, "\n\n"))
++   
++ }
++ 
++ ### ------------------------------------------------------------------------ ###
++ ### TAC constraint
++ input$ctrl.mp$ctrl.is@args$TAC_constraint <- FALSE
++ ### check conditions
++ ### either manually requested or as part of HCR options 4-6 
++ if (exists("TAC_constraint")) {
++ 
++   if (isTRUE(as.logical(TAC_constraint))) {
++     input$ctrl.mp$ctrl.is@args$TAC_constraint <- TRUE
++   }
++ }
++ if (HCRoption %in% 4:6) {
++     input$ctrl.mp$ctrl.is@args$TAC_constraint <- TRUE
++ }
++ ### implement
++ if (isTRUE(input$ctrl.mp$ctrl.is@args$TAC_constraint)) {
++     
++     input$ctrl.mp$ctrl.is@args$lower <- 80
++     input$ctrl.mp$ctrl.is@args$upper <- 125
++     input$ctrl.mp$ctrl.is@args$Btrigger_cond <- TRUE
++     
++     cat(paste0("\nImplementing TAC constraint.\n\n"))
++     
++ } else {
++     
++     cat(paste0("\nTAC constraint NOT implemented.\n\n"))
++     
++ }
++ 
++ ### ------------------------------------------------------------------------ ###
++ ### banking & borrowing
++ if(om_opt==3){ input$iem@args$BB<- FALSE } 
++ if(!om_opt==3)input$iem <- NULL
++ input$ctrl.mp$ctrl.is@args$BB <- FALSE
++  
++ ### check conditions
++ ### either manually requested by BB=TRUE or as part of HCR options 4-6
++ if (exists("BB")) {
++   
++   if (isTRUE(as.logical(BB))) {
++    
++       
++     if(!om_opt==3)input$iem <- FLiem(method = iem_WKNSMSE, args = list(BB = TRUE, imp.error=FALSE, imp.res=NULL))
++     if(om_opt==3){ input$iem@args$BB<- TRUE }  # with IE
++     input$ctrl.mp$ctrl.is@args$BB <- TRUE
++     input$ctrl.mp$ctrl.is@args$BB_check_hcr <- TRUE
++     input$ctrl.mp$ctrl.is@args$BB_check_fc <- TRUE
++     input$ctrl.mp$ctrl.is@args$BB_rho <- c(-0.1, 0.1)
++     
++   }
++ 
++ 
++ if (HCRoption %in% 4:6) {
++     
++   if(!om_opt==3)input$iem <- FLiem(method = iem_WKNSMSE, args = list(BB = TRUE, imp.error=FALSE, imp.res=NULL))
++   if(om_opt==3){ input$iem@args$BB = TRUE } #with IE
++   input$ctrl.mp$ctrl.is@args$BB <- TRUE
++   input$ctrl.mp$ctrl.is@args$BB_check_hcr <- FALSE
++   input$ctrl.mp$ctrl.is@args$BB_check_fc <- FALSE
++   input$ctrl.mp$ctrl.is@args$BB_rho <- c(-0.1, 0.1)
++ 
++   
++   if (HCRoption %in% 4) {
++     
++     input$ctrl.mp$ctrl.is@args$BB_check_hcr <- TRUE
++     
++   } else if (HCRoption %in% 5:6) {
++     
++     input$ctrl.mp$ctrl.is@args$BB_check_fc <- TRUE
++ 
++   }
++ 
++   
++ }
++ 
++ if (input$ctrl.mp$ctrl.is@args$BB) { cat(paste0("\nImplementing banking and borrowing.\n\n")) 
++  
++   
++ } else {
++   
++   cat(paste0("\nBanking and borrowing NOT implemented.\n\n"))
++ }
++ 
++   
++ }
++ 
++  if(om_opt==3) cat(paste0("\n Implementing Implementation error (IBC).\n\n"))
++   
++  
++ 
++ 
++ ### ------------------------------------------------------------------------ ###
++ ### run MSE ####
++ ### ------------------------------------------------------------------------ ###
++ 
++ #debugonce(mse:::goFish)
++ #debugonce(mp)
++ 
++ #print(Sys.time())
++ 
++ ### run MSE
++ res1 <- mp(om = input$om,
++            oem = input$oem,
++            iem = input$iem,
++            ctrl.mp = input$ctrl.mp,
++            genArgs = input$genArgs,
++            tracking = input$tracking)
++            
++ #print(Sys.time())
++ ### save results
++ 
++ 
++ path_out <- paste0("output/runs/whg4/", iters, "_", years)
++ dir.create(path = path_out, recursive = TRUE)
++ file_out <- paste0("OM",om_opt,
++                 "_HCR-", input$ctrl.mp$ctrl.hcr@args$option,
++                    "_Ftrgt-", input$ctrl.mp$ctrl.phcr@args$Ftrgt,
++                    "_Btrigger-", input$ctrl.mp$ctrl.phcr@args$Btrigger,
++                    "_TACconstr-", input$ctrl.mp$ctrl.is@args$TAC_constraint,
++                    "_BB-", input$ctrl.mp$ctrl.is@args$BB
++ )
++ 
++ saveRDS(object = res1, paste0(path_out, "/", file_out, ".rds"))
++ }
+
+Setting custom Btrigger/Ftrgt values.
+Using HCR_comb = 1
+Ftrgt = 0.1
+Btrigger = 140000
+
+
+Implementing TAC constraint.
+
+
+Implementing banking and borrowing.
+
+
+
+Setting custom Btrigger/Ftrgt values.
+Using HCR_comb = 2
+Ftrgt = 0.12
+Btrigger = 140000
+
+
+Implementing TAC constraint.
+
+
+Implementing banking and borrowing.
+
+
+
+Setting custom Btrigger/Ftrgt values.
+Using HCR_comb = 3
+Ftrgt = 0.14
+Btrigger = 140000
+
+
+Implementing TAC constraint.
+
+
+Implementing banking and borrowing.
+
+
+
+Setting custom Btrigger/Ftrgt values.
+Using HCR_comb = 4
+Ftrgt = 0.16
+Btrigger = 140000
+
+
+Implementing TAC constraint.
+
+
+Implementing banking and borrowing.
+
+
+
+Setting custom Btrigger/Ftrgt values.
+Using HCR_comb = 5
+Ftrgt = 0.18
+Btrigger = 140000
+
+
+Implementing TAC constraint.
+
+
+Implementing banking and borrowing.
+
+
+
+Setting custom Btrigger/Ftrgt values.
+Using HCR_comb = 6
+Ftrgt = 0.1
+Btrigger = 160000
+
+
+Implementing TAC constraint.
+
+
+Implementing banking and borrowing.
+
+
+
+Setting custom Btrigger/Ftrgt values.
+Using HCR_comb = 7
+Ftrgt = 0.12
+Btrigger = 160000
+
+
+Implementing TAC constraint.
+
+
+Implementing banking and borrowing.
+
+
+
+Setting custom Btrigger/Ftrgt values.
+Using HCR_comb = 8
+Ftrgt = 0.14
+Btrigger = 160000
+
+
+Implementing TAC constraint.
+
+
+Implementing banking and borrowing.
+
+
+
+Setting custom Btrigger/Ftrgt values.
+Using HCR_comb = 9
+Ftrgt = 0.16
+Btrigger = 160000
+
+
+Implementing TAC constraint.
+
+
+Implementing banking and borrowing.
+
+
+
+Setting custom Btrigger/Ftrgt values.
+Using HCR_comb = 10
+Ftrgt = 0.18
+Btrigger = 160000
+
+
+Implementing TAC constraint.
+
+
+Implementing banking and borrowing.
+
+
+
+Setting custom Btrigger/Ftrgt values.
+Using HCR_comb = 11
+Ftrgt = 0.1
+Btrigger = 180000
+
+
+Implementing TAC constraint.
+
+
+Implementing banking and borrowing.
+
+
+
+Setting custom Btrigger/Ftrgt values.
+Using HCR_comb = 12
+Ftrgt = 0.12
+Btrigger = 180000
+
+
+Implementing TAC constraint.
+
+
+Implementing banking and borrowing.
+
+
+
+Setting custom Btrigger/Ftrgt values.
+Using HCR_comb = 13
+Ftrgt = 0.14
+Btrigger = 180000
+
+
+Implementing TAC constraint.
+
+
+Implementing banking and borrowing.
+
+
+
+Setting custom Btrigger/Ftrgt values.
+Using HCR_comb = 14
+Ftrgt = 0.16
+Btrigger = 180000
+
+
+Implementing TAC constraint.
+
+
+Implementing banking and borrowing.
+
+
+
+Setting custom Btrigger/Ftrgt values.
+Using HCR_comb = 15
+Ftrgt = 0.18
+Btrigger = 180000
+
+
+Implementing TAC constraint.
+
+
+Implementing banking and borrowing.
+
+
+
+Setting custom Btrigger/Ftrgt values.
+Using HCR_comb = 16
+Ftrgt = 0.1
+Btrigger = 2e+05
+
+
+Implementing TAC constraint.
+
+
+Implementing banking and borrowing.
+
+
+
+Setting custom Btrigger/Ftrgt values.
+Using HCR_comb = 17
+Ftrgt = 0.12
+Btrigger = 2e+05
+
+
+Implementing TAC constraint.
+
+
+Implementing banking and borrowing.
+
+
+
+Setting custom Btrigger/Ftrgt values.
+Using HCR_comb = 18
+Ftrgt = 0.14
+Btrigger = 2e+05
+
+
+Implementing TAC constraint.
+
+
+Implementing banking and borrowing.
+
+
+
+Setting custom Btrigger/Ftrgt values.
+Using HCR_comb = 19
+Ftrgt = 0.16
+Btrigger = 2e+05
+
+
+Implementing TAC constraint.
+
+
+Implementing banking and borrowing.
+
+
+
+Setting custom Btrigger/Ftrgt values.
+Using HCR_comb = 20
+Ftrgt = 0.18
+Btrigger = 2e+05
+
+
+Implementing TAC constraint.
+
+
+Implementing banking and borrowing.
+
+
+There were 20 warnings (use warnings() to see them)
+> 
+> 
+> ### ------------------------------------------------------------------------ ###
+> ### terminate ####
+> ### ------------------------------------------------------------------------ ###
+> 
+> ### close R
+> # mpi.finalize()
+> ### mpi.finalize() or mpi.quit() hang...
+> ### -> kill R, the MPI processes stop afterwards
+> quit(save = "no")
+> proc.time()
+     user    system   elapsed 
+ 7138.569   294.187 75887.772 
