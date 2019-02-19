@@ -62,13 +62,13 @@ source("a4a_mse_WKNSMSE_funs_whg.R")
 
 if (HCRoption %in% 1:6) {
   hcr_vals <- expand.grid(
-    Ftrgt = 0.12,
+    Ftrgt =0.13,
     #Ftrgt = seq(from = 0.1, to = 0.2, by = 0.02),
-    Btrigger = c(190000, 210000))
+    Btrigger = seq(from = 170000, to = 200000, by = 10000))
 
 hcr_vals <- rbind(hcr_vals,
-                    expand.grid(Ftrgt = 0.13,
-                                Btrigger = seq(from = 190000, to = 210000, by = 10000)))
+                    expand.grid(Ftrgt = 0.12,
+                                Btrigger = 170000))
 
 }
 
