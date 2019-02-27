@@ -46,14 +46,14 @@ cd $HOME/git/wk_WKNSMSE_whg.27.47d
 
 echo "starting the simulations..."
 ### run array job
-R CMD BATCH --vanilla --quiet "--args om_opt=1 iters=1000 years=20 nblocks=200 par_env=2 n_workers=28 HCRoption=1 HCR_comb=$LSB_JOBINDEX TAC_constraint=0 BB=0" $HOME/git/wk_WKNSMSE_whg.27.47d/run_MSE_whg_UEA.R $HOME/reports/$LSB_JOBID.$LSB_JOBINDEX.Rout
+R CMD BATCH --vanilla --quiet "--args om_opt=1 iters=1000 years=20 nblocks=200 par_env=2 n_workers=28 HCRoption=1 HCR_comb=$LSB_JOBINDEX TAC_constraint=0 BB=0" $HOME/git/wk_WKNSMSE_whg.27.47d/run_MSE_whg_UEA.r $HOME/reports/$LSB_JOBID.$LSB_JOBINDEX.Rout
 
-###R CMD BATCH --vanilla --quiet "--args om_opt=1 iters=1000 years=20 nblocks=200 par_env=2 n_workers=28 HCRoption=3 HCR_comb=$LSB_JOBINDEX TAC_constraint=0 BB=0" $HOME/git/wk_WKNSMSE_whg.27.47d/run_MSE_whg_UEA.R $HOME/reports/$LSB_JOBID.$LSB_JOBINDEX.Rout
+###R CMD BATCH --vanilla --quiet "--args om_opt=1 iters=1000 years=20 nblocks=200 par_env=2 n_workers=28 HCRoption=3 HCR_comb=$LSB_JOBINDEX TAC_constraint=0 BB=0" $HOME/git/wk_WKNSMSE_whg.27.47d/run_MSE_whg_UEA.r $HOME/reports/$LSB_JOBID.$LSB_JOBINDEX.Rout
 
-###R CMD BATCH --vanilla --quiet "--args om_opt=1 iters=1000 years=20 nblocks=200 par_env=2 n_workers=28 HCRoption=4 HCR_comb=$LSB_JOBINDEX TAC_constraint=1 BB=1" $HOME/git/wk_WKNSMSE_whg.27.47d/run_MSE_whg_UEA.R $HOME/reports/$LSB_JOBID.$LSB_JOBINDEX.Rout
+###R CMD BATCH --vanilla --quiet "--args om_opt=1 iters=1000 years=20 nblocks=200 par_env=2 n_workers=28 HCRoption=4 HCR_comb=$LSB_JOBINDEX TAC_constraint=1 BB=1" $HOME/git/wk_WKNSMSE_whg.27.47d/run_MSE_whg_UEA.r $HOME/reports/$LSB_JOBID.$LSB_JOBINDEX.Rout
 
-###R CMD BATCH --vanilla --quiet "--args om_opt=1 iters=1000 years=20 nblocks=200 par_env=2 n_workers=28 HCRoption=5 HCR_comb=$LSB_JOBINDEX TAC_constraint=1 BB=1" $HOME/git/wk_WKNSMSE_whg.27.47d/run_MSE_whg_UEA.R $HOME/reports/$LSB_JOBID.$LSB_JOBINDEX.Rout
+###R CMD BATCH --vanilla --quiet "--args om_opt=1 iters=1000 years=20 nblocks=200 par_env=2 n_workers=28 HCRoption=5 HCR_comb=$LSB_JOBINDEX TAC_constraint=1 BB=1" $HOME/git/wk_WKNSMSE_whg.27.47d/run_MSE_whg_UEA.r $HOME/reports/$LSB_JOBID.$LSB_JOBINDEX.Rout
 
-###R CMD BATCH --vanilla --quiet "--args om_opt=1 iters=1000 years=20 nblocks=200 par_env=2 n_workers=28 HCRoption=6 HCR_comb=$LSB_JOBINDEX TAC_constraint=1 BB=1" $HOME/git/wk_WKNSMSE_whg.27.47d/run_MSE_whg_UEA.R $HOME/reports/$LSB_JOBID.$LSB_JOBINDEX.Rout
+###R CMD BATCH --vanilla --quiet "--args om_opt=1 iters=1000 years=20 nblocks=200 par_env=2 n_workers=28 HCRoption=6 HCR_comb=$LSB_JOBINDEX TAC_constraint=1 BB=1" $HOME/git/wk_WKNSMSE_whg.27.47d/run_MSE_whg_UEA.r $HOME/reports/$LSB_JOBID.$LSB_JOBINDEX.Rout
 
 echo "done!"
