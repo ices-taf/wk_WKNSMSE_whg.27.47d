@@ -57,33 +57,6 @@ source("a4a_mse_WKNSMSE_funs.R")
 ### par_env=1 -> MPI (Rmpi, DoMPI)
 ### par_env=2 -> DoParallel
 
-### ------------------------------------------------------------------------ ###
-### set HCR parameters 
-
-if (HCRoption %in% 1:6) {
-
-  hcr_vals <- expand.grid(
-    #Ftrgt =0.13,
-    Ftrgt = seq(from = 0.16, to = 0.16, by = 0.01),
-    Btrigger = seq(from = 250000, to = 250000, by = 10000))
-    
-#  hcr_vals <- expand.grid(
-#    Ftrgt = 0.172,
-#    Btrigger = 166708)
-
-                             
-#hcr_vals <- rbind(hcr_vals,
-#                   expand.grid(Ftrgt = c(0.15),
-#                               Btrigger = 240000))
-                               
-#hcr_vals <- rbind(hcr_vals,
-#                   expand.grid(Ftrgt = 0.19,
-#                               Btrigger = 270000))                               
-                                    
-
-}
-
-
 if (par_env == 1) {
   
   library(doMPI)
@@ -111,7 +84,7 @@ if (par_env == 1) {
   library(stockassessment)
   library(foreach)
   library(doRNG)
-  setwd(paste("/home/miethet/MSE_whiting", sep=""))
+ setwd(paste("/home/miethet/MSE_whiting", sep=""))
 
   source("a4a_mse_WKNSMSE_funs.R")
 }
@@ -160,7 +133,32 @@ if (exists("HCRoption")) {
   
   cat(paste0("\nUsing default HCR option: HCR ", 
              input$ctrl.mp$ctrl.hcr@args$option, "\n\n"))
- HCRoption <- 0
+  HCRoption <- 0
+  
+}
+
+
+### ------------------------------------------------------------------------ ###
+### set HCR parameters 
+if (HCRoption %in% 1:6) {
+
+  
+ ### additional combinations after finding yield maximum
+ 
+  comb_max <- switch(HCRoption, 
+                     "1" = c(220000, 0.14), 
+                     "2" = c(200000, 0.16), 
+                     "3" = c(220000, 0.14),
+                     "4" = c(250000, 0.16),
+                     "5" = c(210000, 0.16),
+                     "6" = c(230000, 0.15))
+  hcr_vals <- expand.grid(Ftrgt = c(comb_max[2]*0.9, comb_max[2]*1.1, 0.158, 0.172), Btrigger = comb_max[1])
+
+
+# for alternative OM 2 and OM3
+if(om_opt>1) hcr_vals <- expand.grid(Ftrgt = comb_max[2], Btrigger = comb_max[1])
+#
+
   
 }
 
@@ -187,7 +185,7 @@ if (exists("HCR_comb")) {
              "Btrigger = ", Btrigger, "\n\n"))
   
 } else {
-   input$ctrl.mp$ctrl.phcr@args$Ftrgt <- Ftrgt
+  input$ctrl.mp$ctrl.phcr@args$Ftrgt <- Ftrgt
    input$ctrl.mp$ctrl.is@args$hcrpars$Ftrgt <- Ftrgt
    input$ctrl.mp$ctrl.phcr@args$Btrigger <- Btrigger
    input$ctrl.mp$ctrl.is@args$hcrpars$Btrigger <- Btrigger
@@ -232,7 +230,7 @@ if (isTRUE(input$ctrl.mp$ctrl.is@args$TAC_constraint)) {
 if(om_opt==3){ input$iem@args$BB<- FALSE } 
 if(!om_opt==3)input$iem <- NULL
 input$ctrl.mp$ctrl.is@args$BB <- FALSE
- 
+
 ### check conditions
 ### either manually requested by BB=TRUE or as part of HCR options 4-6
 if (exists("BB")) {
@@ -274,8 +272,9 @@ if (HCRoption %in% 4:6) {
 }
 
 if (input$ctrl.mp$ctrl.is@args$BB) { cat(paste0("\nImplementing banking and borrowing.\n\n")) 
- 
-  
+
+
+
 } else {
   
   cat(paste0("\nBanking and borrowing NOT implemented.\n\n"))
@@ -292,10 +291,6 @@ if (input$ctrl.mp$ctrl.is@args$BB) { cat(paste0("\nImplementing banking and borr
 ### ------------------------------------------------------------------------ ###
 ### run MSE ####
 ### ------------------------------------------------------------------------ ###
-
-#debugonce(mse:::goFish)
-#debugonce(mp)
-
 print(Sys.time())
 
 ### run MSE
@@ -305,7 +300,7 @@ res1 <- mp(om = input$om,
            ctrl.mp = input$ctrl.mp,
            genArgs = input$genArgs,
            tracking = input$tracking)
-           
+
 print(Sys.time())
 ### save results
 
@@ -313,7 +308,7 @@ print(Sys.time())
 path_out <- paste0("output/runs/whg4/", iters, "_", years)
 dir.create(path = path_out, recursive = TRUE)
 file_out <- paste0("OM",om_opt,
-                "_HCR-", input$ctrl.mp$ctrl.hcr@args$option,
+                 "_HCR-", input$ctrl.mp$ctrl.hcr@args$option,
                    "_Ftrgt-", input$ctrl.mp$ctrl.phcr@args$Ftrgt,
                    "_Btrigger-", input$ctrl.mp$ctrl.phcr@args$Btrigger,
                    "_TACconstr-", input$ctrl.mp$ctrl.is@args$TAC_constraint,
@@ -324,42 +319,6 @@ saveRDS(object = res1, paste0(path_out, "/", file_out, ".rds"))
 }
 
 ### ------------------------------------------------------------------------ ###
-### combine and plot ####
-### ------------------------------------------------------------------------ ###
-if(FALSE){output <- readRDS(paste0(path_out, "/", file_out, ".rds"))
-
-original <- readRDS(paste0("input/whg4/",iters,"_",years,"/stk.rds"))
-
-new1<-original
-new1[, ac(2018:2038)]<-res1@stock[,ac(2018:2038)]
-
-
-#tiff(paste0("output/runs/plots_",om_opt,"_",iters,"/mse_stock.tiff"), bg="white",  res=200, width = 900, height = 1200)
-#par(mar=c(4,4,4,2))
-#plot(new1)
-#dev.off()
-
-#
-### save
- saveRDS(object = new1, file = paste0(path_out, "/", file_out,"_base_full_stk.rds"))
-#### plot
- plot(new1, probs = c(0.05, 0.25, 0.5, 0.75, 0.95)) + 
-  xlab("year") + geom_vline(xintercept = 2018) +
-  geom_hline(data = data.frame(qname = "SSB", data = 119970),
-              aes(yintercept = data), linetype = "dashed") +
-  geom_hline(data = data.frame(qname = "SSB", data = 166708),
-              aes(yintercept = data), linetype = "solid") +
-  geom_hline(data = data.frame(qname = "F", data = 0.458),
-              aes(yintercept = data), linetype = "dashed") +
-  geom_hline(data = data.frame(qname = "F", data = 0.33),
-              aes(yintercept = data), linetype = "solid") +
-  theme_bw()
-ggsave(filename = paste0(path_out, "/", file_out, ".png"), 
-        width = 30, height = 20, units = "cm", dpi = 300, type = "cairo")
-
-
-}
-### ------------------------------------------------------------------------ ###
 ### terminate ####
 ### ------------------------------------------------------------------------ ###
 
@@ -367,5 +326,5 @@ ggsave(filename = paste0(path_out, "/", file_out, ".png"),
 # mpi.finalize()
 ### mpi.finalize() or mpi.quit() hang...
 ### -> kill R, the MPI processes stop afterwards
-quit(save = "no")
 
+quit(save = "no")

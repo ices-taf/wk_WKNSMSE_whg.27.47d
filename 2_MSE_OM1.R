@@ -16,6 +16,9 @@ library(FLash)
 library(tidyr)
 library(dplyr)
 
+
+
+
 setwd(paste("/home/miethet/MSE_whiting", sep=""))
 
 source("a4a_mse_WKNSMSE_funs.R")
@@ -27,12 +30,40 @@ n<-1000
 # save.image(file = "input/whg4/image_10.RData")
 load(file = paste0("input/whg4/base_image/image_",om_opt,"_",n,".RData"))
 
+#plot survey deviances for projectioon period
+
+tiff(paste0("output/",n,"OM_noise_survey1.tiff"), bg="white",  res=200, width = 900, height = 1200)
+par(mar=c(4,4,4,2))
+plot(idx_dev[[1]], probs = c(0.05, 0.25, 0.5, 0.75, 0.95),)
+
+dev.off()
+
+tiff(paste0("output/",n,"OM_noise_survey2.tiff"), bg="white",  res=200, width = 900, height = 1200)
+par(mar=c(4,4,4,2))
+plot(idx_dev[[2]], probs = c(0.05, 0.25, 0.5, 0.75, 0.95))
+ 
+dev.off()
+
+xx<-idx_dev[[1]]
+x<-xx[,,,,,c(1:3)]
+tiff(paste0("output/",n,"OM_noise_survey1_iter.tiff"), bg="white",  res=200, width = 900, height = 1100)
+ggplot(data=x,aes(year,data))+ geom_line(aes(group=iter))+ facet_wrap(~age, scales="free_y", nrow=5)+
+theme(plot.margin = unit(c(1,1,1,2),"cm"))
+dev.off()
+
+xx<-idx_dev[[2]]
+x<-xx[,,,,,c(1:3)]
+tiff(paste0("output/",n,"OM_noise_survey2_iter.tiff"), bg="white",  res=200, width = 1500, height = 1100)
+par(mar=c(4,4,4,0))
+ggplot(data=x,aes(year,data))+ geom_line(aes(group=iter))+ facet_wrap(~age, scales="free_y", nrow=5)+
+theme(plot.margin = unit(c(1,1,1,2),"cm"))
+dev.off()
 
 
 ### reference points
 refpts_mse <- list(Btrigger = 166708,
                    Ftrgt = 0.172,
-				   Fpa = 0.33,
+				           Fpa = 0.33,
                    Bpa = 166708,
                    Blim = 119970
         				  
