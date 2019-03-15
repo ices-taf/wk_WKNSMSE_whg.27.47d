@@ -110,7 +110,7 @@ combs <- merge(combs, stats, all.x = TRUE)
 table1<-rbind(table1,combs)
 
 }
-write.csv(x = data_long, file = paste0("output/runs/whg4/",iters,"_",years,"/HCR_comb_stats_short.csv"), row.names = FALSE)
+write.csv(x = data_short, file = paste0("output/runs/whg4/",iters,"_",years,"/HCR_comb_stats_short.csv"), row.names = FALSE)
 
 
 
