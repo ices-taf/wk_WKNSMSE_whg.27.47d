@@ -299,6 +299,12 @@ par(mar=c(4,4,4,1))
 plot(sr[,,,,,1], cex=0.5)
 dev.off()
 
+tiff(paste0("output/",n,"sr1983_new.tiff"), bg="white",  res=200, width = 1200, height = 1100)
+par(mar=c(4,4,4,1))
+plot(iter(sr,1), cex=0.5)
+dev.off()
+
+
 tiff(paste0("output/",n,"sr1983_alliters.tiff"), bg="white",  res=200, width = 1200, height = 1100)
 par(mar=c(4,4,4,1))
 plot(sr, cex=0.5)
@@ -309,6 +315,10 @@ par(mar=c(4,4,4,1))
 plot(sr1[,,,,,1], cex=0.5)
 dev.off()
 
+tiff(paste0("output/",n,"sr2002_new.tiff"), bg="white",  res=200, width = 1200, height = 1100)
+par(mar=c(4,4,4,1))
+plot(iter(sr1,1), cex=0.5)
+dev.off()
 
 
 ### check breakpoints
