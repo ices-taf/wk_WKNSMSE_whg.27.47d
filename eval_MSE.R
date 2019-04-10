@@ -49,18 +49,18 @@ Fmsy<-0.172
 datastats<-read.csv(paste0("output/runs/whg4/",iters,"_",years,"/stats.csv"))
 
 
-data_long<-datastats[,c("OM","Ftrgt","Btrigger","HCR","TACconstr","BB","catch_median_long","ssb_median_long","iav_long","risk3_long","risk1_long","F_median_long","conv_failed","F_maxed")]
-data_medium<-datastats[,c("OM","Ftrgt","Btrigger","HCR","TACconstr","BB","catch_median_medium","ssb_median_medium","iav_medium","risk3_medium","risk1_medium","F_median_medium","conv_failed","F_maxed")]
-data_short<-datastats[,c("OM","Ftrgt","Btrigger","HCR","TACconstr","BB","catch_median_short","ssb_median_short","iav_short","risk3_short","risk1_short","F_median_short","conv_failed","F_maxed")]
+data_long<-datastats[,c("OM","Ftrgt","Btrigger","HCR","TACconstr","BB","catch_median_long","ssb_median_long","iav_long","iavTAC_long","risk3_long","risk1_long","F_median_long","conv_failed","F_maxed")]
+data_medium<-datastats[,c("OM","Ftrgt","Btrigger","HCR","TACconstr","BB","catch_median_medium","ssb_median_medium","iav_medium","iavTAC_medium","risk3_medium","risk1_medium","F_median_medium","conv_failed","F_maxed")]
+data_short<-datastats[,c("OM","Ftrgt","Btrigger","HCR","TACconstr","BB","catch_median_short","ssb_median_short","iav_short","iavTAC_short","risk3_short","risk1_short","F_median_short","conv_failed","F_maxed")]
 
 data_medium[,c("catch_median_medium","ssb_median_medium")]<-round(data_medium[,c("catch_median_medium","ssb_median_medium")])
-data_medium[,c("iav_medium","risk3_medium","risk1_medium","F_median_medium")]<-round(data_medium[,c("iav_medium","risk3_medium","risk1_medium","F_median_medium")],3)
+data_medium[,c("iav_medium","iavTAC_medium","risk3_medium","risk1_medium","F_median_medium")]<-round(data_medium[,c("iav_medium","iavTAC_medium","risk3_medium","risk1_medium","F_median_medium")],3)
 
 data_short[,c("catch_median_short","ssb_median_short")]<-round(data_short[,c("catch_median_short","ssb_median_short")])
-data_short[,c("iav_short","risk3_short","risk1_short","F_median_short")]<-round(data_short[,c("iav_short","risk3_short","risk1_short","F_median_short")],3)
+data_short[,c("iav_short","iavTAC_short","risk3_short","risk1_short","F_median_short")]<-round(data_short[,c("iav_short","iavTAC_short","risk3_short","risk1_short","F_median_short")],3)
 
 data_long[,c("catch_median_long","ssb_median_long")]<-round(data_long[,c("catch_median_long","ssb_median_long")])
-data_long[,c("iav_long","risk3_long","risk1_long","F_median_long")]<-round(data_long[,c("iav_long","risk3_long","risk1_long","F_median_long")],3)
+data_long[,c("iav_long","iavTAC_long","risk3_long","risk1_long","F_median_long")]<-round(data_long[,c("iav_long","iavTAC_long","risk3_long","risk1_long","F_median_long")],3)
 
 
 write.csv(x = data_long, file = paste0("output/runs/whg4/",iters,"_",years,"/stats_long.csv"), row.names = FALSE)
@@ -88,7 +88,31 @@ combs <- merge(combs, stats, all.x = TRUE)
 table1<-rbind(table1,combs)
 
 }
-write.csv(x = data_long, file = paste0("output/runs/whg4/",iters,"_",years,"/HCR_comb_stats_long.csv"), row.names = FALSE)
+write.csv(x = table1, file = paste0("output/runs/whg4/",iters,"_",years,"/HCR_comb_stats_long.csv"), row.names = FALSE)
+
+
+stats<-data_medium
+table1<-NULL
+
+for(j in 1:3){
+combs <- data.frame(name = c("F0","A*","A", "B", "C", "AD", "BE", "CE"), 
+                    OM=j,  
+                    HCR = c("A","A","A", "B", "C", "A", "B", "C"),
+                    BB = c(rep(FALSE, 5), TRUE, TRUE, TRUE),
+                    TACconstr = c(rep(FALSE, 5), TRUE, TRUE, TRUE),
+                    Btrigger = c(MSYbtrigger,MSYbtrigger,220000, 200000, 220000, 250000, 210000,230000),
+                    Ftrgt = c(0,0.172,0.14, 0.16, 0.14, 0.16, 0.16, 0.15),
+                    scenario = 0)  
+
+
+combs <- merge(combs, stats, all.x = TRUE)
+
+table1<-rbind(table1,combs)
+
+}
+write.csv(x = table1, file = paste0("output/runs/whg4/",iters,"_",years,"/HCR_comb_stats_medium.csv"), row.names = FALSE)
+
+
 
 
 stats<-data_short
@@ -110,7 +134,7 @@ combs <- merge(combs, stats, all.x = TRUE)
 table1<-rbind(table1,combs)
 
 }
-write.csv(x = data_short, file = paste0("output/runs/whg4/",iters,"_",years,"/HCR_comb_stats_short.csv"), row.names = FALSE)
+write.csv(x = table1, file = paste0("output/runs/whg4/",iters,"_",years,"/HCR_comb_stats_short.csv"), row.names = FALSE)
 
 
 
