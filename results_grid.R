@@ -390,19 +390,19 @@ highlight_max<-TRUE
 
 ### A
 grid(dat = stats %>%
-       filter(OM==1,HCR == "A" & BB == FALSE & TACconstr == FALSE &
+       filter(OM==1,HCR == "A" & BB == FALSE & TACconstr == FALSE & Ftrgt>0,
        Ftrgt %in% round(seq(0, 1, 0.01), 2)), 
      HCR = "A", time = "long", add_risk1 = FALSE, highlight_max<-TRUE)
 ggsave(filename = paste0("output/runs/whg4/",iters,"_",years,"/grid_A_long.png"), 
        width = 30, height = 20, units = "cm", dpi = 300, type = "cairo")
 grid(dat = stats %>%
-       filter(OM==1,HCR == "A" & BB == FALSE & TACconstr == FALSE & 
+       filter(OM==1,HCR == "A" & BB == FALSE & TACconstr == FALSE & Ftrgt>0,
        Ftrgt %in% round(seq(0, 1, 0.01), 2)), 
      HCR = "A", time = "medium")
 ggsave(filename = paste0("output/runs/whg4/",iters,"_",years,"/grid_A_medium.png"), 
        width = 30, height = 20, units = "cm", dpi = 300, type = "cairo")
 grid(dat = stats %>%
-       filter(OM==1,HCR == "A" & BB == FALSE & TACconstr == FALSE &
+       filter(OM==1,HCR == "A" & BB == FALSE & TACconstr == FALSE & Ftrgt>0,
       Ftrgt %in% round(seq(0, 1, 0.01), 2)), 
      HCR = "A", time = "short")
 ggsave(filename =paste0("output/runs/whg4/",iters,"_",years,"/grid_A_short.png"), 
