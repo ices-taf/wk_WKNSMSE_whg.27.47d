@@ -47,9 +47,9 @@ Fpa<-0.33
 Fmsy<-0.172
 
 datastats<-read.csv(paste0("output/runs/whg4/",iters,"_",years,"/stats.csv"))
+                   
 
-
-data_long<-datastats[,c("OM","Ftrgt","Btrigger","HCR","TACconstr","BB","catch_median_long","ssb_median_long","iav_long","iavTAC_long","risk3_long","risk1_long","F_median_long","conv_failed","F_maxed")]
+data_long<-datastats[,c("OM","Ftrgt","Btrigger","HCR","TACconstr","BB","catch_median_long","ssb_median_long","iav_long","iavTAC_long","risk3_long","risk1_long","F_median_long","conv_failed","F_maxed","recovery_proportion","recovery_time")]
 data_medium<-datastats[,c("OM","Ftrgt","Btrigger","HCR","TACconstr","BB","catch_median_medium","ssb_median_medium","iav_medium","iavTAC_medium","risk3_medium","risk1_medium","F_median_medium","conv_failed","F_maxed")]
 data_short<-datastats[,c("OM","Ftrgt","Btrigger","HCR","TACconstr","BB","catch_median_short","ssb_median_short","iav_short","iavTAC_short","risk3_short","risk1_short","F_median_short","conv_failed","F_maxed")]
 
@@ -128,7 +128,6 @@ combs <- data.frame(name = c("F0","A*","A", "B", "C", "AD", "BE", "CE"),
                     Ftrgt = c(0,0.172,0.14, 0.16, 0.14, 0.16, 0.16, 0.15),
                     scenario = 0)  
 
-
 combs <- merge(combs, stats, all.x = TRUE)
 
 table1<-rbind(table1,combs)
@@ -137,6 +136,62 @@ table1<-rbind(table1,combs)
 write.csv(x = table1, file = paste0("output/runs/whg4/",iters,"_",years,"/HCR_comb_stats_short.csv"), row.names = FALSE)
 
 
+# extra table 1
+
+stats<-datastats
+table2<-NULL
+
+for(j in 1:1){
+combs <- data.frame(name = c("F0","A*","A", "B", "C", "AD", "BE", "CE"), 
+                    OM=j,  
+                    HCR = c("A","A","A", "B", "C", "A", "B", "C"),
+                    BB = c(rep(FALSE, 5), TRUE, TRUE, TRUE),
+                    TACconstr = c(rep(FALSE, 5), TRUE, TRUE, TRUE),
+                    Btrigger = c(MSYbtrigger,MSYbtrigger,220000, 200000, 220000, 250000, 210000,230000),
+                    Ftrgt = c(0,0.172,0.14, 0.16, 0.14, 0.16, 0.16, 0.15),
+                    scenario = 0)  
+
+combs <- merge(combs, stats, all.x = TRUE)
+
+table2<-rbind(table2,combs)
+}
+
+table2$HCRnew<-paste0(table2$BB,"_",table2$HCR,"_",table2$OM)  
+table2<-table2[,c("HCRnew","Ftrgt", "Btrigger", "catch_median_long","ssb_median_long","F_median_long","iav_long","iavTAC_long","risk3_long","risk1_long","catch_median_medium","ssb_median_medium","F_median_medium","iav_medium","iavTAC_medium","risk3_medium","risk1_medium","catch_median_short","ssb_median_short", "F_median_short", "iav_short","iavTAC_short","risk3_short","risk1_short","conv_failed","F_maxed","recovery_proportion","recovery_time")]
+
+#rounding
+table2[,c("iav_long","iavTAC_long","iav_medium","iavTAC_medium","iav_short","iavTAC_short","F_median_long","F_median_medium","F_median_short")]<-round(table2[,c("iav_long","iavTAC_long","iav_medium","iavTAC_medium","iav_short","iavTAC_short","F_median_long","F_median_medium","F_median_short")],3)
+table2[,c("catch_median_long","ssb_median_long","catch_median_medium","ssb_median_medium","catch_median_short","ssb_median_short")]<-round(table2[,c("catch_median_long","ssb_median_long","catch_median_medium","ssb_median_medium","catch_median_short","ssb_median_short")])
+table2<-(t(table2))
+
+write.csv(x = table2, file = paste0("output/runs/whg4/",iters,"_",years,"/HCR_comb_stats_extra1.csv"), row.names = TRUE)
+
+
+stats<-datastats
+combs <- data.frame(name = rep(c("A", "B", "C", "AD", "BE", "CE"), each = 5),
+                    HCR = rep(c("A", "B", "C", "A", "B", "C"), each = 5),
+                    BB = rep(c(rep(FALSE, 3), rep(TRUE, 3)), each = 5),
+                    TACconstr = rep(c(rep(FALSE, 3), rep(TRUE, 3)), each = 5),
+                    Btrigger = rep(c(220000, 200000, 220000, 250000, 210000, 230000), each = 5),
+                    Ftrgt = c(0.14 * c(0.9, 1, 1.1), 0.158, 0.172,
+                              0.16 * c(0.9, 1, 1.1), 0.158, 0.172,
+                              0.14 * c(0.9, 1, 1.1), 0.158, 0.172,
+                              0.16 * c(0.9, 1, 1.1), 0.158, 0.172,
+                              0.16 * c(0.9, 1, 1.1), 0.158, 0.172,
+                              0.15 * c(0.9, 1, 1.1), 0.158, 0.172),
+                    scenario = c("0.9*Ftrgt", "Ftrgt", "1.1*Ftrgt",
+                                 "Fmsylower", "Fmsyupper"),
+                    OM = 1)
+table3 <- merge(combs, stats, all.x=TRUE)
+
+table3$HCRnew<-paste0(table3$BB,"_",table3$HCR)  
+table3<-table3[,c("scenario","HCRnew","Ftrgt", "Btrigger", "catch_median_long","ssb_median_long","F_median_long","iav_long","iavTAC_long","risk3_long","risk1_long","catch_median_medium","ssb_median_medium","F_median_medium","iav_medium","iavTAC_medium","risk3_medium","risk1_medium","catch_median_short","ssb_median_short", "F_median_short", "iav_short","iavTAC_short","risk3_short","risk1_short","conv_failed","F_maxed")]
+
+#rounding
+table3[,c("iav_long","iavTAC_long","iav_medium","iavTAC_medium","iav_short","iavTAC_short","F_median_long","F_median_medium","F_median_short")]<-round(table3[,c("iav_long","iavTAC_long","iav_medium","iavTAC_medium","iav_short","iavTAC_short","F_median_long","F_median_medium","F_median_short")],3)
+table3[,c("catch_median_long","ssb_median_long","catch_median_medium","ssb_median_medium","catch_median_short","ssb_median_short")]<-round(table3[,c("catch_median_long","ssb_median_long","catch_median_medium","ssb_median_medium","catch_median_short","ssb_median_short")])
+table3<-(t(table3))
+write.csv(x = table3, file = paste0("output/runs/whg4/",iters,"_",years,"/HCR_comb_stats_extra2.csv"), row.names = TRUE)
 
 
 
@@ -481,10 +536,10 @@ stats_full <- function(data) {
                value = c(window(catch(stk_i@stock), start = 2029))),
     data.frame(name = i$name, scenario = i$scenario,
                key = "catch_medium",
-               value = c(window(catch(stk_i@stock), start = 2019, end = 2023))),
+               value = c(window(catch(stk_i@stock), start = 2024, end = 2028))),
     data.frame(name = i$name, scenario = i$scenario,
                key = "catch_short",
-               value = c(window(catch(stk_i@stock), start = 2024, end = 2028))),
+               value = c(window(catch(stk_i@stock), start = 2019, end = 2023))),
     data.frame(name = i$name, scenario = i$scenario,
                key = "risk1_long",
                value = mean(window(ssb(stk_i@stock), start = 2029) < Blim)),
@@ -518,7 +573,7 @@ stats_full <- function(data) {
     data.frame(name = i$name, scenario = i$scenario,
                key = "iav_short",
                value = c(iav(object = catch(window(stock(stk_i), 
-                                                   start = 2018, end = 2023))))),
+                                                   start = 2019, end = 2023))))),
     data.frame(name = i$name, scenario = i$scenario,
                key = "ssb_long",
                value = c(window(ssb(stk_i@stock), start = 2029))),
